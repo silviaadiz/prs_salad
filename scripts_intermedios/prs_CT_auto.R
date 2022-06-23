@@ -34,11 +34,11 @@ system2("module load plink")
 wd<-opt$dir
 setwd(wd)
 
-list_of_files<-gsub(".bim","",list.files(pattern=paste0(pat,"*.bim")))
+list_of_files<-gsub(".bim","",list.files(pattern=paste0(opt$binary,"*.bim")))
 
 
 	for (i in 1:23){
- bin<-list_of_files[i]
+ bin<-list_of_files[grepl(paste0("chr",i)] # fix this line
 	system2("plink",args = c(paste0("--bfile ",bin,sep=""),"--allow-no-sex",
 	paste0("--clump ", opt$summary,sep=""),paste0("--clump-field ", opt$pval,sep=""),
 	paste0("--clump-snp-field ", opt$snp,sep=""), paste0("--clump-p1 ", opt$p1,sep=""),paste0("--clump-p2",opt$p2,sep=""),paste0("--clump-r2",opt$rsq,sep=""),paste0("--clump-kb",opt$clump_kb,sep=""),paste0("--out CLUMPED_",opt$out,"_",opt$p1,"_chr",i,sep=""),"--silent"))
