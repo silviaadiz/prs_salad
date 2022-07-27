@@ -17,7 +17,7 @@ option_list = list(
     make_option(c("--pval"), type="character", default="pval",help="Pval field on sumstats. Default pval "),
     make_option(c("--snp"), type="character", default="SNP",help="SNP field on sumstats. Default SNP "),
     make_option(c("--ea"), type="character", default="A1",help="Effect allele on sumstats. Default A1"),
-    make_option(c("--pheno"), type="character", default=NULL,help="Pheno file (txt SEPARATED BY SPACES)"),
+    make_option(c("--pheno"), type="character", default=NULL,help="Pheno file (txt delimited BY SPACES)"),
     make_option(c("--pheno_field"), type="character", default=NULL,help="Pheno field on pheno file"),
     make_option(c("--logistic"), type="logical", default=TRUE,help="Pheno is binary or continous?"),
     make_option(c("--covar"), type="character", default=NULL,help="Covariates for the model separated by comma"),
