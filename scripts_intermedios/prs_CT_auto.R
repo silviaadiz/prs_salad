@@ -175,17 +175,17 @@ if (opt$reg==TRUE){
   
   
   cv<-function(data,kn,r,logistic){
-  aucval<-numeric(length=kn)
-  r2<-numeric(length=kn)
-  r2_prs<-numeric(length=kn)
-  aucval_prs<-numeric(length=kn)
-  rsq<-numeric(length=kn)
-  rsq_prs<-numeric(length=kn)
-  rmse<-numeric(length=kn)
-  rmse_prs<-numeric(length=kn)
-  k<-numeric(length=kn)
+  aucval<-numeric(=kn)
+  r2<-numeric(kn)
+  r2_prs<-numeric(kn)
+  aucval_prs<-numeric(kn)
+  rsq<-numeric(kn)
+  rsq_prs<-numeric(kn)
+  rmse<-numeric(kn)
+  rmse_prs<-numeric(kn)
+  k<-numeric(kn)
   RMSE <- function(x) { sqrt(mean(x^2)) }
-  res_rep<-NULL
+  if (logistic){res_rep<-numeric(length=4)} else {res_rep<-numeric(length=5)}
   
   rept=1
     while(rept<=r){
