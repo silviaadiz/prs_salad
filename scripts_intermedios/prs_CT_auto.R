@@ -66,18 +66,18 @@ if (opt$vcf==TRUE){
   if (is.null(opt$chr)){
     for (i in seq_along(1:23)){
       bin<-midf[midf$chr==i,"archivo"]
-      system2("plink",args = c(paste0("--vcf ",bin,sep="")," --allow-no-sex",
-                               paste0("--clump ", opt$summary,sep=""),paste0("--clump-field ", opt$pval,sep=""),
-                               paste0("--clump-snp-field ", opt$snp,sep=""), paste0("--clump-p1 ", opt$p1,sep=""),paste0("--clump-r2 ",opt$rsq,sep=""),paste0("--clump-kb ",opt$kb,sep=""),paste0("--out CLUMPED_",opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_chr",i,sep="")," --silent"))
+      system2("plink",args = c(paste0("--vcf ",bin," --allow-no-sex --clump ", opt$summary," --clump-field ", opt$pval,
+                                      " --clump-snp-field ", opt$snp," --clump-p1 ", opt$p1" --clump-r2 ",opt$rsq,
+                               " --clump-kb ",opt$kb, " --out CLUMPED_",opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_chr",i," --silent"))
     }
   } else {
     seq_chr<-as.numeric(strsplit((opt$chr),",")[[1]])
     seq_chr<-as.vector(seq_chr)
     for (i in seq_chr){
       bin<-list_of_files[grepl(paste0("(?<![0-9])",i,"(?![0-9])"),list_of_files,perl=T)]
-      system2("plink",args = c(paste0("--bfile ",bin,sep="")," --allow-no-sex",
-                               paste0("--clump ", opt$summary,sep=""),paste0("--clump-field ", opt$pval,sep=""),
-                               paste0("--clump-snp-field ", opt$snp,sep=""), paste0("--clump-p1 ", opt$p1,sep=""),paste0("--clump-r2 ",opt$rsq,sep=""),paste0("--clump-kb ",opt$kb,sep=""),paste0("--out CLUMPED_",opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_chr",i,sep="")," --silent"))
+      system2("plink",args = c(paste0("--bfile ",bin," --allow-no-sex --clump ", opt$summary," --clump-field ", opt$pval,
+                               " --clump-snp-field ", opt$snp," --clump-p1 ", opt$p1," --clump-r2 ",opt$rsq," --clump-kb ",opt$kb,
+                                      " --out CLUMPED_",opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_chr",i," --silent"))
     }
   }
 } else {
