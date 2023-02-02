@@ -93,7 +93,7 @@ if (opt$vcf==TRUE){
   if (is.null(opt$chr)){
     for (i in 1:23){
       bin<-midf[midf$chr==i,"archivo"]
-      system2("plink",args = c("--bfile ",bin," --allow-no-sex",
+      system2("plink",args = c(paste0("--bfile ",bin," --allow-no-sex"),
                                paste0("--clump ", opt$summary,sep=""),paste0("--clump-field ", opt$pval,sep=""),
                                paste0("--clump-snp-field ", opt$snp,sep=""), paste0("--clump-p1 ", opt$p1,sep=""),paste0("--clump-r2 ",opt$rsq,sep=""),paste0("--clump-kb ",opt$kb,sep=""),paste0("--out CLUMPED_",opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_chr",i,sep="")," --silent"))
     }
