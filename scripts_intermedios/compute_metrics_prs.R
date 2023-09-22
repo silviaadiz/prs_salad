@@ -1,6 +1,5 @@
  library(optparse)
 
-# SILVIA ES QUE VER O DE CARGAR PLINk!
 
 option_list = list(
     make_option(c("--wd"), type="character", default=NULL,help="Working directory",metavar="character"),
