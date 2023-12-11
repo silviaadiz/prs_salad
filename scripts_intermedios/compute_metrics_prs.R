@@ -46,9 +46,11 @@ pheno<-read.table(opt$pheno,header=T)
   
   results <- boot(data=pheno2, statistic=dif_rsq,
    R=reps, formula1=f1,formula2=f2)
-outp<-results$t0
-r2_iclow<-quantile(results$t[,1],0.025)
-r2_ichigh<-quantile(results$t[,1],0.975)
+outp<-mean(results$t)
+cis<-ci.boot(results,type="basic")
+
+r2_iclow<-cis$basic[4]
+r2_ichigh<-cis$basic[5]
 outp2<-cbind(outp,r2_iclow,r2_ichigh)
 names(outp2)<-c("r2_inc","ic_low","ic_high")
 
