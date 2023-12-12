@@ -47,7 +47,7 @@ pheno<-read.table(opt$pheno,header=T)
   results <- boot(data=pheno2, statistic=dif_rsq,
    R=reps, formula1=f1,formula2=f2)
 outp<-mean(results$t)
-cis<-ci.boot(results,type="basic")
+cis<-boot.ci(results,type="basic")
 
 r2_iclow<-cis$basic[4]
 r2_ichigh<-cis$basic[5]
