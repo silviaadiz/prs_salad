@@ -1,7 +1,8 @@
 library(optparse)
- library(rms)
-  library(pROC)
 
+
+
+# SILVIA ES QUE VER O DE CARGAR PLINk!
 
 option_list = list(
   make_option(c("--wd"), type="character", default=NULL,help="Working directory",metavar="character"),
@@ -44,14 +45,13 @@ if(opt$reg==TRUE){
   pheno<-read.table(opt$pheno,header=T)
   pheno["fenotipo"]<-pheno[opt$pheno_field]
   pheno$fenotipo<-as.factor(pheno$fenotipo)
-
+  
   if (opt$logistic==TRUE){
     if (any(levels(pheno$fenotipo)==c("0","1"))){} else {stop("ERROR: Logistic regression is selected but column is not coded as 1/0")}}
-
+  
 }
 
-pk<-"module load plink"
-system(pk)
+#system2("module load plink")
 wd<-opt$wd
 
 if (opt$vcf==TRUE){
@@ -66,18 +66,18 @@ if (opt$vcf==TRUE){
   if (is.null(opt$chr)){
     for (i in seq_along(1:23)){
       bin<-midf[midf$chr==i,"archivo"]
-      system2("plink",args = c(paste0("--vcf ",bin," --allow-no-sex --clump ", opt$summary," --clump-field ", opt$pval,
-                                      " --clump-snp-field ", opt$snp," --clump-p1 ", opt$p1" --clump-r2 ",opt$rsq,
-                               " --clump-kb ",opt$kb, " --out CLUMPED_",opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_chr",i," --silent"))
+      system2("plink",args = c(paste0("--vcf ",bin,sep="")," --allow-no-sex",
+                               paste0("--clump ", opt$summary,sep=""),paste0("--clump-field ", opt$pval,sep=""),
+                               paste0("--clump-snp-field ", opt$snp,sep=""), paste0("--clump-p1 ", opt$p1,sep=""),paste0("--clump-r2 ",opt$rsq,sep=""),paste0("--clump-kb ",opt$kb,sep=""),paste0("--out CLUMPED_",opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_chr",i,sep="")," --silent"))
     }
   } else {
     seq_chr<-as.numeric(strsplit((opt$chr),",")[[1]])
     seq_chr<-as.vector(seq_chr)
     for (i in seq_chr){
       bin<-list_of_files[grepl(paste0("(?<![0-9])",i,"(?![0-9])"),list_of_files,perl=T)]
-      system2("plink",args = c(paste0("--bfile ",bin," --allow-no-sex --clump ", opt$summary," --clump-field ", opt$pval,
-                               " --clump-snp-field ", opt$snp," --clump-p1 ", opt$p1," --clump-r2 ",opt$rsq," --clump-kb ",opt$kb,
-                                      " --out CLUMPED_",opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_chr",i," --silent"))
+      system2("plink",args = c(paste0("--bfile ",bin,sep="")," --allow-no-sex",
+                               paste0("--clump ", opt$summary,sep=""),paste0("--clump-field ", opt$pval,sep=""),
+                               paste0("--clump-snp-field ", opt$snp,sep=""), paste0("--clump-p1 ", opt$p1,sep=""),paste0("--clump-r2 ",opt$rsq,sep=""),paste0("--clump-kb ",opt$kb,sep=""),paste0("--out CLUMPED_",opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_chr",i,sep="")," --silent"))
     }
   }
 } else {
@@ -93,7 +93,7 @@ if (opt$vcf==TRUE){
   if (is.null(opt$chr)){
     for (i in 1:23){
       bin<-midf[midf$chr==i,"archivo"]
-      system2("plink",args = c(paste0("--bfile ",bin," --allow-no-sex"),
+      system2("plink",args = c("--bfile ",bin," --allow-no-sex",
                                paste0("--clump ", opt$summary,sep=""),paste0("--clump-field ", opt$pval,sep=""),
                                paste0("--clump-snp-field ", opt$snp,sep=""), paste0("--clump-p1 ", opt$p1,sep=""),paste0("--clump-r2 ",opt$rsq,sep=""),paste0("--clump-kb ",opt$kb,sep=""),paste0("--out CLUMPED_",opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_chr",i,sep="")," --silent"))
     }
@@ -171,44 +171,45 @@ if (opt$reg==TRUE){
   pheno2$st.score<-(pheno2$SCORE-mean(pheno2$SCORE))/sd(pheno2$SCORE)
   
   cat("ben1")
- 
+  library(rms)
+  library(pROC)
   
   
   cv<-function(data,kn,r,logistic){
-  aucval<-numeric(=kn)
-  r2<-numeric(kn)
-  r2_prs<-numeric(kn)
-  aucval_prs<-numeric(kn)
-  rsq<-numeric(kn)
-  rsq_prs<-numeric(kn)
-  rmse<-numeric(kn)
-  rmse_prs<-numeric(kn)
-  k<-numeric(kn)
-  RMSE <- function(x) { sqrt(mean(x^2)) }
-  if (logistic){res_rep<-numeric(length=4)} else {res_rep<-numeric(length=5)}
-  
-  rept=1
+    aucval<-as.numeric()
+    r2<-as.numeric()
+    r2_prs<-as.numeric()
+    aucval_prs<-as.numeric()
+    rsq<-as.numeric()
+    rsq_prs<-as.numeric()
+    rmse<-as.numeric()
+    rmse_prs<-as.numeric()
+    k<-as.numeric()
+    RMSE <- function(x) { sqrt(mean(x^2)) }
+    res_rep<-NULL
+    
+    rept=1
     while(rept<=r){
-  datar <- data[sample(nrow(data)),] # shuffling
-    fold  <- cut(seq(1,nrow(datar)),breaks=kn,labels=FALSE)
+      datar <- data[sample(nrow(data)),] # shuffling
+      fold  <- cut(seq(1,nrow(datar)),breaks=kn,labels=FALSE)
       for(i in 1:kn){
         test <- datar[which(fold==i,arr.ind=TRUE),]
         train<-datar[-(which(fold==i,arr.ind=TRUE)),]
         if(logistic==TRUE){
-        mod1<-lrm(formula1,train)
-        r2[i]<-mod1$stats["R2"]
-        preds<-predict(mod1,test,type="lp")
-        roc_a<-roc(test$fenotipo,predictor=preds)
-        aucval[i]<-roc_a$auc
-               
-        mod2<-lrm(formula2,train)
-        r2_prs[i]<-mod2$stats["R2"]
-        preds2<-predict(mod2,test,type="lp")
-        roc_a2<-roc(test$fenotipo,predictor=preds2)
-        aucval_prs[i]<-roc_a2$auc
-        k[i]<-i
-        
-      } else {mod1<-lm(formula1,train)
+          mod1<-lrm(formula1,train)
+          r2[i]<-mod1$stats["R2"]
+          preds<-predict(mod1,test,type="lp")
+          roc_a<-roc(test$fenotipo,predictor=preds)
+          aucval[i]<-roc_a$auc
+          
+          mod2<-lrm(formula2,train)
+          r2_prs[i]<-mod2$stats["R2"]
+          preds2<-predict(mod2,test,type="lp")
+          roc_a2<-roc(test$fenotipo,predictor=preds2)
+          aucval_prs[i]<-roc_a2$auc
+          k[i]<-i
+          
+        } else {mod1<-lm(formula1,train)
         preds<-predict(mod1,test,type="response")
         rsq[i]<-summary(mod1)$adj.r.squared
         rmse[i]<-RMSE(mod1$residuals)
@@ -219,27 +220,27 @@ if (opt$reg==TRUE){
         rmse_prs[i]<-RMSE(mod2$residuals)
         k[i]<-i
         
-      }
+        }
       }
       if(logistic==TRUE) {results_kfold<-cbind(r2,r2_prs,aucval,aucval_prs)} else {results_kfold<-cbind(k,rsq,rmse,rsq_prs,rmse_prs)}
       res_rep1<-colMeans(results_kfold)
       res_rep<-rbind(res_rep,res_rep1)
       rept=rept+1}
-      return(res_rep)
-      print(res_rep)}
-      
-      
+    return(res_rep)
+    print(res_rep)}
+  
+  
   set.seed(394855)
   
-
+  
   formula1<-as.formula(gsub(",","+",paste("fenotipo","~",opt$covar,sep="")))
   formula2<-as.formula(gsub(",","+",paste("fenotipo","~",opt$covar,"+st.score",sep="")))
-
-
+  
+  
   k=opt$kn
+  
+  res_kf<-cv(pheno2,kn=k,r=100,logistic=opt$logistic)
+  write.table(res_kf,paste0(opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_kfold",opt$kn,"_xval_performance.txt",sep=""),quote=F,row.names=F)}
 
-res_kf<-cv(pheno2,kn=k,r=100,logistic=opt$logistic)}
-write.table(res_kf,paste0(opt$out,"_",opt$p1,"_",opt$rsq,"_",opt$kb,"_kfold",opt$kn,"_xval_performance.txt",sep=""),quote=F,row.names=F)
-}
 
 
