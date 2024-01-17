@@ -1,12 +1,8 @@
 #--- LASSO + BOOTSTRAP -------------------------------
-# Habitualmente emprçegase unha mostra tes para escoller lambda e despois probase na test
-# para predicir os coef
-# Exploro que coeficientes escollo para o modelo final
 
-# Isto vale para validar o modelo cando non existe cohore de doentes adicional
 
 library(glmnet)
-library(ROCR)
+library(pROC)
 
 boot_lasso<-function(data,pheno,covar,interactions=F,interactions_covar=NULL,B){
 
