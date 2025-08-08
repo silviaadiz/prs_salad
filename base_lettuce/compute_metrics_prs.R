@@ -27,11 +27,11 @@ opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
 # Input validation
-if (is.null(opt$wd)) stop("Working directory (--wd) is required")
-if (is.null(opt$score)) stop("Score file prefix (--score) is required")
-if (is.null(opt$pheno)) stop("Phenotype file (--pheno) is required")
-if (is.null(opt$pheno_field)) stop("Phenotype field (--pheno_field) is required")
-if (is.null(opt$covar)) stop("Covariates (--covar) are required")
+if (is.null(opt$wd)) stop("Working directory (--wd) is missing")
+if (is.null(opt$score)) stop("Score file prefix (--score) is missing")
+if (is.null(opt$pheno)) stop("Phenotype file (--pheno) is missing")
+if (is.null(opt$pheno_field)) stop("Phenotype field (--pheno_field) is missing")
+if (is.null(opt$covar)) stop("Covariates (--covar) are missing")
 
 wd <- opt$wd
 if (!dir.exists(wd)) stop(paste("Working directory does not exist:", wd))
@@ -39,26 +39,22 @@ setwd(wd)
 
 # Load required libraries
 if (!requireNamespace("rms", quietly = TRUE)) {
-  stop("rms package is required but not installed")
+ install.packages("rms")
 }
 if (!requireNamespace("boot", quietly = TRUE)) {
-  stop("boot package is required but not installed")
+  install.packages("boot")
 }
 
 library(rms)
 library(boot)
 
-if (!file.exists(opt$pheno)) stop(paste("Phenotype file does not exist:", opt$pheno))
-
 pheno <- read.table(opt$pheno, header = TRUE, stringsAsFactors = FALSE)
-
 
 pheno[["fenotipo"]] <- pheno[[opt$pheno_field]]
 pheno$fenotipo <- as.factor(pheno$fenotipo)
 
 if (length(levels(pheno$fenotipo)) != 2) {
-  warning("Phenotype should be binary for logistic regression analysis")
-}
+  warning("Phenotype should be binary: this script is for logistic analysis")}
 
 score_file <- paste0(opt$score, "_", opt$p1, "_", opt$rsq, "_", opt$kb, ".profile")
 
@@ -88,9 +84,7 @@ dif_rsq <- function(data, index, formula1, formula2) {
     return(NULL)
   })
   
-  if (is.null(mod1) || is.null(mod2)) {
-    return(NA)
-  }
+  if (is.null(mod1) || is.null(mod2)) {return(NA)}
   
   dif <- mod2$stats["R2"] - mod1$stats["R2"]
   return(dif)
@@ -118,13 +112,9 @@ outp2 <- data.frame(
   n_bootstrap = reps,
   n_success = n_success,
   n_fail = n_fail,
-  PRS = paste0(opt$p1, "_", opt$rsq, "_", opt$kb)
-)
+  PRS = paste0(opt$p1, "_", opt$rsq, "_", opt$kb))
 
-output_file <- paste0(
-  opt$out, "_", opt$p1, "_", opt$rsq, "_", opt$kb,
-  "_validation_bootstrap_", opt$nrep, ".txt"
-)
+output_file <- paste0(opt$out, "_", opt$p1, "_", opt$rsq, "_", opt$kb, "_validation_bootstrap_", opt$nrep, ".txt")
 
 write.table(outp2, output_file, quote = FALSE, row.names = FALSE, sep = "\t")
 
